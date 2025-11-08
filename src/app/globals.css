@@ -1,7 +1,3 @@
-/* This is a hard reset test. We are not using @tailwind directives for now. */
-
-body {
-  background-color: #111827; /* This is a dark slate-blue color */
-  color: #e2e8f0; /* This is a light slate color for text */
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
