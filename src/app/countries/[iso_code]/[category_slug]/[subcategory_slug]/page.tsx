@@ -1,50 +1,28 @@
 import { supabase } from '@/lib/supabaseClient';
 import { notFound } from 'next/navigation';
-import Image from 'next/image';
 import Link from 'next/link';
 
-// --- تعریف انواع داده برای امنیت و خوانایی کد ---
 interface Movie { id: number; title: string; director: string; poster_url: string; }
-interface Category { id: number; name: string; }
-interface Country { id: number; name: string; }
 interface PageProps { params: { iso_code: string; category_slug: string; subcategory_slug?: string; }; }
 
-// --- تابع اصلی واکشی داده (فقط یک بار تعریف شده) ---
+function slugToTitle(slug: string): string { return slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '); }
+
 async function fetchData(params: PageProps['params']) {
-  const countryResult = await supabase.from('countries').select('id, name').eq('iso_code', params.iso_code.toUpperCase()).single();
-  const country = countryResult.data;
-
+  const country = (await supabase.from('countries').select('id, name').eq('iso_code', params.iso_code.toUpperCase()).single()).data;
   const currentSlug = params.subcategory_slug || params.category_slug;
-  const currentCategoryResult = await supabase.from('categories').select('id, name').eq('name', slugToTitle(currentSlug)).single();
-  const currentCategory = currentCategoryResult.data;
-
-  if (!country || !currentCategory) {
-    notFound();
-  }
+  const currentCategory = (await supabase.from('categories').select('id, name').eq('name', slugToTitle(currentSlug)).single()).data;
+  if (!country || !currentCategory) notFound();
 
   const { data: subCategories } = await supabase.from('categories').select('id, name').eq('parent_id', currentCategory.id).order('name');
-  
   let movies: Movie[] = [];
   if (!subCategories || subCategories.length === 0) {
     const { data: movieData } = await supabase.from('movies').select('*').eq('country_id', country.id).eq('category_id', currentCategory.id);
     movies = movieData || [];
   }
-
-  let parentCategory: Category | null = null;
-  if (params.subcategory_slug) {
-    const parentCategoryResult = await supabase.from('categories').select('id, name').eq('name', slugToTitle(params.category_slug)).single();
-    parentCategory = parentCategoryResult.data;
-  }
-  
+  const parentCategory = params.subcategory_slug ? (await supabase.from('categories').select('id, name').eq('name', slugToTitle(params.category_slug)).single()).data : null;
   return { country, currentCategory, subCategories: subCategories || [], movies, parentCategory };
 }
 
-// --- تابع کمکی (فقط یک بار تعریف شده) ---
-function slugToTitle(slug: string): string {
-  return slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-}
-
-// --- کامپوننت اصلی صفحه ---
 export default async function GenericCategoryPage(props: PageProps) {
   const params = await props.params || {};
   const { country, currentCategory, subCategories, movies, parentCategory } = await fetchData(params);
@@ -55,16 +33,10 @@ export default async function GenericCategoryPage(props: PageProps) {
         <div className="text-center mb-12">
           <p className="text-md text-pink-400 mb-2">
             <Link href={`/countries/${params.iso_code}`} className="hover:underline">{country.name}</Link>
-            {parentCategory && (
-              <>
-                {' > '}
-                <Link href={`/countries/${params.iso_code}/${parentCategory.name.toLowerCase().replace(/ /g, '-')}`} className="hover:underline">{parentCategory.name}</Link>
-              </>
-            )}
+            {parentCategory && ( <> {' > '} <Link href={`/countries/${params.iso_code}/${parentCategory.name.toLowerCase().replace(/ /g, '-')}`} className="hover:underline">{parentCategory.name}</Link> </> )}
           </p>
           <h1 className="text-5xl font-bold">{currentCategory.name}</h1>
         </div>
-        
         {subCategories.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {subCategories.map(subCat => (
@@ -80,7 +52,7 @@ export default async function GenericCategoryPage(props: PageProps) {
             {movies.map((movie: Movie) => (
               <div key={movie.id} className="text-left">
                  <div className="bg-slate-800 rounded-lg overflow-hidden aspect-[2/3] relative">
-                    {movie.poster_url && <Image src={movie.poster_url} alt={`Poster for ${movie.title}`} fill sizes="(max-width: 640px) 50vw, 20vw" className="object-cover" />}
+                    {movie.poster_url && <img src={movie.poster_url} alt={`Poster for ${movie.title}`} className="w-full h-full object-cover" loading="lazy" />}
                  </div>
                  <h3 className="mt-2 font-semibold text-white">{movie.title}</h3>
                  <p className="text-sm text-gray-400">{movie.director}</p>
