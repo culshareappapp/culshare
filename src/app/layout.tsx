@@ -1,16 +1,17 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
+import "./globals.css"; // این فایل CSS تست ما را وارد میکند
 import Header from "@/components/Header";
 
-const inter = Inter({ subsets: ["latin"] });
+// ما فونت Inter را موقتا غیرفعال میکنیم تا یک متغیر کمتر داشته باشیم
+// const inter = Inter({ subsets: ["latin"] }); 
 
 export const metadata: Metadata = { title: "CulShare", description: "A social platform for sharing cultural and artistic interests." };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} bg-slate-900 text-slate-100`}>
+      {/* تگ body دیگر هیچ کلاسی ندارد و فقط به globals.css تکیه میکند */}
+      <body>
         <Header />
         <main>{children}</main>
       </body>
