@@ -10,7 +10,9 @@ export const metadata: Metadata = { title: "CulShare", description: "A social pl
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} bg-slate-900 text-slate-100`}>
+      {/* --- تغییر کلیدی اینجاست --- */}
+      {/* ما یک گرادیانت زیبا به عنوان پس‌زمینه کل اپلیکیشن اعمال میکنیم */}
+      <body className={`${inter.className} bg-gradient-to-br from-gray-900 to-slate-800 text-slate-100`}>
         <Header />
         <main>{children}</main>
       </body>

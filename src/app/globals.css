@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* --- استایل سفارشی ما برای کارت های شیشه ای --- */
+.glass-card {
+  background: rgba(30, 41, 59, 0.5); /* پس زمینه نیمه شفاف خاکستری-آبی (slate-800 با 50% شفافیت) */
+  backdrop-filter: blur(10px); /* افکت اصلی مات کردن پس زمینه */
+  -webkit-backdrop-filter: blur(10px); /* برای سازگاری با مرورگرهای وبکیت */
+  border: 1px solid rgba(255, 255, 255, 0.1); /* یک حاشیه بسیار محو برای تاکید بر لبه های شیشه */
+}
